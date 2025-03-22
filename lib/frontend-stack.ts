@@ -40,6 +40,13 @@ export class FrontendStack extends cdk.Stack {
         origin: s3Origin,
       },
       defaultRootObject: "index.html",
+      errorResponses: [
+        {
+          httpStatus: 404,
+          responseHttpStatus: 200,
+          responsePagePath: "/index.html",
+        },
+      ],
     });
   }
 }

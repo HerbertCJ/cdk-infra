@@ -23,6 +23,8 @@ export class AuthStack extends cdk.Stack {
       },
     });
 
+    //add login redirect to /home and logout redirect to /logout
+
     new cognito.UserPoolDomain(this, "UserPoolDomain", {
       userPool: userPool,
       cognitoDomain: {

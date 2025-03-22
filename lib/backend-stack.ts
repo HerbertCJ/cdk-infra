@@ -53,6 +53,17 @@ export class BackendStack extends cdk.Stack {
 
     const httpApi = new apigateway.HttpApi(this, "BackendApi", {
       apiName: "BackendHttpApi",
+      corsPreflight: {
+        allowHeaders: ["Authorization", "Content-Type"],
+        allowMethods: [
+          apigateway.CorsHttpMethod.GET,
+          apigateway.CorsHttpMethod.POST,
+          apigateway.CorsHttpMethod.PATCH,
+          apigateway.CorsHttpMethod.DELETE,
+        ],
+        allowOrigins: ["*"], //change to my cloudfront origin from frontendstack
+        maxAge: cdk.Duration.days(10),
+      },
     });
 
     const httpAuthorizer = new authorizers.HttpJwtAuthorizer(
