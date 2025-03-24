@@ -5,6 +5,8 @@ import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import * as origins from "aws-cdk-lib/aws-cloudfront-origins";
 
 export class FrontendStack extends cdk.Stack {
+  public readonly cloudFrontDomain: string;
+
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
@@ -35,7 +37,7 @@ export class FrontendStack extends cdk.Stack {
       ],
     });
 
-    new cloudfront.Distribution(this, "distribution", {
+    const distribution = new cloudfront.Distribution(this, "distribution", {
       defaultBehavior: {
         origin: s3Origin,
       },
@@ -48,5 +50,7 @@ export class FrontendStack extends cdk.Stack {
         },
       ],
     });
+
+    this.cloudFrontDomain = distribution.distributionDomainName;
   }
 }

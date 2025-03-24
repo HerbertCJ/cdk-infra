@@ -2,12 +2,18 @@ import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as cognito from "aws-cdk-lib/aws-cognito";
 
+interface AuthStackProps extends cdk.StackProps {
+  cloudFrontDomain: string;
+}
+
 export class AuthStack extends cdk.Stack {
   public readonly userPoolId: string;
   public readonly userPoolClientId: string;
 
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: AuthStackProps) {
     super(scope, id, props);
+
+    const { cloudFrontDomain } = props;
 
     const userPool = new cognito.UserPool(this, "UserPool", {
       selfSignUpEnabled: true,
@@ -23,12 +29,10 @@ export class AuthStack extends cdk.Stack {
       },
     });
 
-    //add login redirect to /home and logout redirect to /logout
-
     new cognito.UserPoolDomain(this, "UserPoolDomain", {
       userPool: userPool,
       cognitoDomain: {
-        domainPrefix: "userpool-b08a29b0",
+        domainPrefix: "auth-b08a29b0",
       },
     });
 
@@ -37,6 +41,21 @@ export class AuthStack extends cdk.Stack {
       authFlows: {
         userPassword: true,
         userSrp: true,
+      },
+      oAuth: {
+        callbackUrls: [`https://${cloudFrontDomain}/home`],
+        logoutUrls: [`https://${cloudFrontDomain}/logout`],
+        flows: {
+          authorizationCodeGrant: true,
+          implicitCodeGrant: true,
+        },
+        scopes: [
+          cognito.OAuthScope.EMAIL,
+          cognito.OAuthScope.OPENID,
+          cognito.OAuthScope.PROFILE,
+          cognito.OAuthScope.COGNITO_ADMIN,
+          cognito.OAuthScope.PHONE,
+        ],
       },
     });
 
